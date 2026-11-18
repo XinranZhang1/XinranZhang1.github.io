@@ -1,4 +1,4 @@
-name: Deploy Food Tarot to Pages
+name: Deploy Academic Site to Pages
 
 on:
   push:
@@ -20,17 +20,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@4a9ddd6f338a97768b8006bf671dfbad383215f4
+        with:
+          ruby-version: "3.1"
+          bundler-cache: true
+          cache-version: 0
+
       - name: Setup Pages
+        id: pages
         uses: actions/configure-pages@v5
-      - name: Verify Food Tarot bundle
-        run: |
-          test -s public-site/index.html
-          test -s public-site/models/hand_landmarker.task
-          grep -q '/xinran.github.io/assets/' public-site/index.html
+
+      - name: Build with Jekyll
+        run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
+        env:
+          JEKYLL_ENV: production
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./public-site
 
   deploy:
     environment:
